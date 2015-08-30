@@ -1,7 +1,16 @@
 app.service('instagramService', ['$q', '$log', '$http', function($q, log, $http) {
 
-    var getInitialSelfFlow = function() {
-        return $http.get('./model/instagramService.php').
+    var getInitialSelfFlow = function(userId) {
+        return $http({
+                url: './model/instagramService.php',
+                method: "POST",
+                data: $.param({
+                    userId: userId
+                }),
+                headers: { 
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).
             success(function(data, status, headers, config) {
                 return data;
             }).
@@ -10,12 +19,13 @@ app.service('instagramService', ['$q', '$log', '$http', function($q, log, $http)
             });
     };
 
-    var getSelfFlowWithMaxId = function(maxId) {
+    var getSelfFlowWithMaxId = function(userId, maxId) {
         return $http({
                 url: './model/instagramService.php',
                 method: "POST",
                 data: $.param({
-                    maxId: maxId
+                    maxId: maxId,
+                    userId: userId
                 }),
                 headers: { 
                     'Content-Type': 'application/x-www-form-urlencoded'
@@ -29,12 +39,35 @@ app.service('instagramService', ['$q', '$log', '$http', function($q, log, $http)
             });
     };
 
+    var searchForUser = function(query) {
+        return $http({
+                url: './model/instagramService.php',
+                method: "POST",
+                data: $.param({
+                    action: "search",
+                    query: query
+                }),
+                headers: { 
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).
+            success(function(data, status, headers, config) {
+                return data;
+            }).
+            error(function(data, status, headers, config) {
+                log.error('searchForUser fail');
+            });
+    };
+
     return {
-        getInitialSelfFlow: function() {
-            return getInitialSelfFlow();
+        getInitialSelfFlow: function(userId) {
+            return getInitialSelfFlow(userId);
         },
-        getSelfFlowWithMaxId: function(maxId) {
-            return getSelfFlowWithMaxId(maxId);
+        getSelfFlowWithMaxId: function(userId, maxId) {
+            return getSelfFlowWithMaxId(userId, maxId);
+        },
+        searchForUser: function(query) {
+            return searchForUser(query);
         }
     };
 }]);

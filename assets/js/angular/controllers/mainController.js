@@ -1,10 +1,18 @@
 app.controller('mainController', ['$scope', '$log', 'instagramService', function($scope, log, instagramService) {
 	$scope.fullFlowList = [];
-    $scope.loading = true;
+    $scope.loading = false;
+    $scope.noUserFound = false;
+    $scope.searchQuery = '';
     var tagdb = {};
+    var userId = '';
 
     function init() {
-        var promise = instagramService.getInitialSelfFlow();
+        
+    };
+
+    function getInitialFlowForUser() {
+        $scope.loading = true;
+        var promise = instagramService.getInitialSelfFlow(userId);
 
         var successCallback = function(response) {
             var encodedResponse = JSON.parse(response.data);
@@ -18,10 +26,10 @@ app.controller('mainController', ['$scope', '$log', 'instagramService', function
         };
 
         return promise.then(successCallback, errorCallback);
-    };
+    }
 
     function getNextPage(nextMaxId) {
-        var promise = instagramService.getSelfFlowWithMaxId(nextMaxId);
+        var promise = instagramService.getSelfFlowWithMaxId(userId, nextMaxId);
 
         var successCallback = function(response) {
             var encodedResponse = JSON.parse(response.data);
@@ -68,6 +76,47 @@ app.controller('mainController', ['$scope', '$log', 'instagramService', function
         $scope.fullFlowList.sort(fullFlowListSort);
         log.debug($scope.fullFlowList);
         $scope.loading = false;
+    };
+
+    function searchForUser(query) {
+        tagdb = new Object();
+        $scope.fullFlowList = [];
+        var promise = instagramService.searchForUser(query);
+
+        var successCallback = function(response) {
+            $scope.noUserFound = false;
+
+            var encodedResponse = JSON.parse(response.data);
+            var encodedResponse = JSON.parse(encodedResponse);
+            log.debug(encodedResponse);
+
+            if (encodedResponse.data.length === 0)
+            {
+                $scope.noUserFound = true;
+            } else {
+                var found = false;
+                for (var i = 0; i < encodedResponse.data.length; i++) {
+                    if (encodedResponse.data[i].username === query) {
+                        found = true;
+                        userId = encodedResponse.data[i].id;
+                        getInitialFlowForUser();
+                    }
+                }
+                if (!found) {
+                    $scope.noUserFound = true;
+                }
+            }
+        };
+
+        var errorCallback = function() {
+            log.error(':(');
+        };
+
+        return promise.then(successCallback, errorCallback);
+    };
+
+    $scope.search = function() {
+        searchForUser($scope.searchQuery);
     };
 
     function fullFlowListSort(a, b) {

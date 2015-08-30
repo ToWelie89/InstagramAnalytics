@@ -16,11 +16,18 @@
        <div id="main">
             <p id="sizeIndicator"></p>
             <h1>Instagram analyzer</h1>
+    
+            <div style="padding-bottom: 20px;">
+                <input type="text" placeholder="Instagram username" data-ng-model="searchQuery"></input>
+                <button data-ng-click="search()">Search</button>
+                <span data-ng-show="noUserFound">No user found</span>
+            </div>
+
             <div data-ng-repeat="tag in fullFlowList" data-ng-cloak>
                 <span data-ng-bind="tag.name"></span> - <span data-ng-bind="tag.value"></span>
             </div>
             <div class="textAlignCenter" data-ng-show="loading">
-                LOADING
+                <img src="img/spinner.gif" height="52" width="52" />
             </div>
        </div>
     </body>
