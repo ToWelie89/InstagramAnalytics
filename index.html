@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns="http:/www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="utf-8"/>
+        <script src="assets/js/libs/jquery-2.1.1.min.js"></script>
+        <script src="assets/js/libs/angular.min.js"></script>
+        <script src="assets/js/angular/config/app.js"></script>
+        <script src="assets/js/angular/services/instagramService.js"></script>
+        <script src="assets/js/angular/controllers/mainController.js"></script>
+        <link rel="stylesheet" type="text/css" href="assets/styles/default.css">
+        <title>
+            Steam Sale Notifier
+        </title>
+    </head>
+    <body data-ng-app="instaAnalyzeApp" data-ng-controller="mainController">
+       <div id="main">
+            <p id="sizeIndicator"></p>
+            <h1>Instagram analyzer</h1>
+            <div data-ng-repeat="tag in fullFlowList" data-ng-cloak>
+                <span data-ng-bind="tag.name"></span> - <span data-ng-bind="tag.value"></span>
+            </div>
+            <div class="textAlignCenter" data-ng-show="loading">
+                LOADING
+            </div>
+       </div>
+    </body>
+</html>
