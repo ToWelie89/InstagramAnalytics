@@ -59,6 +59,26 @@ app.service('instagramService', ['$q', '$log', '$http', function($q, log, $http)
             });
     };
 
+    var getUserInformation = function(userId) {
+        return $http({
+                url: './model/instagramService.php',
+                method: "POST",
+                data: $.param({
+                    action: "getUserInformation",
+                    userId: userId
+                }),
+                headers: { 
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).
+            success(function(data, status, headers, config) {
+                return data;
+            }).
+            error(function(data, status, headers, config) {
+                log.error('getUserInformation fail');
+            });
+    };
+
     return {
         getInitialSelfFlow: function(userId) {
             return getInitialSelfFlow(userId);
@@ -68,6 +88,9 @@ app.service('instagramService', ['$q', '$log', '$http', function($q, log, $http)
         },
         searchForUser: function(query) {
             return searchForUser(query);
-        }
+        },
+        getUserInformation: function(userId) {
+            return getUserInformation(userId);
+        },
     };
 }]);

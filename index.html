@@ -1,34 +1,108 @@
 <!DOCTYPE html>
-<html xmlns="http:/www.w3.org/1999/xhtml">
+<html xmlns="http:/www.w3.org/1999/xhtml" lang="sv">
     <head>
         <meta charset="utf-8"/>
+        <link href='https://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet' type='text/css'>
+        <script src="assets/js/libs/Chart.js"></script>
         <script src="assets/js/libs/jquery-2.1.1.min.js"></script>
         <script src="assets/js/libs/angular.min.js"></script>
         <script src="assets/js/angular/config/app.js"></script>
         <script src="assets/js/angular/services/instagramService.js"></script>
         <script src="assets/js/angular/controllers/mainController.js"></script>
+        <link rel="stylesheet" type="text/css" href="assets/styles/bootstrap.css">
+        <link rel="stylesheet" type="text/css" href="assets/styles/bootstrap-theme.css">
         <link rel="stylesheet" type="text/css" href="assets/styles/default.css">
         <title>
-            Steam Sale Notifier
+            Instagram Analyzer
         </title>
     </head>
     <body data-ng-app="instaAnalyzeApp" data-ng-controller="mainController">
-       <div id="main">
-            <p id="sizeIndicator"></p>
-            <h1>Instagram analyzer</h1>
-    
-            <div style="padding-bottom: 20px;">
-                <input type="text" placeholder="Instagram username" data-ng-model="searchQuery"></input>
-                <button data-ng-click="search()">Search</button>
-                <span data-ng-show="noUserFound">No user found</span>
+        <div style="margin: auto; height: 100%; padding: 0px;width: 828px;">
+            <div style="width: 50px; height:100%; display: inline-block; margin-right: -4px; /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,000000+100&amp;0+0,0.65+100 */
+background: -moz-linear-gradient(left,  rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,0.65))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(left,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(left,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(left,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* IE10+ */
+background: linear-gradient(to right,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#a6000000',GradientType=1 ); /* IE6-9 */
+">
             </div>
+            <div style="width: 720px; height:100%; display: inline-block; vertical-align:top;" id="main">
+                <p id="sizeIndicator"></p>
+                <h1 style="margin-top: 10px; font-weight: 900; letter-spacing: 2px; display: inline-block;">Instagram Analyzer</h1>
+                <h6 style="display: inline-block; float: right; margin-top: 25px; font-family: 'Orbitron', sans-serif;">
+                    Made by <a href="http://www.martinsonesson.se" target="_blank">Martin Sonesson</a>
+                </h6>
+                
+                <div style="padding-bottom: 20px; margin-top:10px;">
+                    <form>
+                        <input class="form-control" style="width: 70%; display: inline-block;" type="text" placeholder="Instagram username" data-ng-model="searchQuery"></input>
+                        <button class="form-control" style="width: 25%; display: inline-block;" data-ng-click="search()" data-ng-disabled="loading">Search</button>
+                    </form>
+                    <span data-ng-show="noUserFound">No user found</span>
+                </div>
 
-            <div data-ng-repeat="tag in fullFlowList" data-ng-cloak>
-                <span data-ng-bind="tag.name"></span> - <span data-ng-bind="tag.value"></span>
+                <div data-ng-show="userId && !loading">
+                    <div style="width: 33%; display: inline-block; vertical-align: top;">
+                        <div style="padding-bottom: 20px;">
+                            <strong>Most used hashtags</strong>
+                        </div>
+                        <div style="" data-ng-cloak>
+                            <div data-ng-repeat="tag in fullFlowList | limitTo: 35">
+                                <span data-ng-bind="tag.name"></span> - <span data-ng-bind="tag.value"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="width: 33%; display: inline-block; vertical-align: top; padding-left: 20px;" data-ng-cloak>
+                        <div style="padding-bottom: 20px;">
+                            <strong>Most popular content</strong>
+                        </div>
+                        <div data-ng-repeat="image in imagedb | limitTo:5" style="width: 150px;">
+                            <a href="{{image.link}}" target="_blank">
+                                <div style="background: url({{image.thumbnail}}); height: 150px; width: 150px; padding-left: 0px; padding-top: 3px;" class="thumbnail">
+                                    <span style="padding: 5px; color: white; background: darkgray; border-bottom-right-radius: 4px;">{{image.count}}</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div style="width: 27%; display: inline-block; vertical-align: top;">
+                        <div style="padding-bottom: 20px;">
+                            <strong>User information</strong>
+                        </div>
+                        <img data-ng-src="{{userInformation.profile_picture}}" style="border-radius: 10px; width: 100px; margin-bottom: 20px;" />
+                        <div>
+                            <strong>Full name:</strong><br>{{userInformation.full_name}}
+                        </div>
+                        <div>
+                            <strong>Bio:</strong><br>{{userInformation.bio}}
+                        </div>
+                        <div>
+                            <strong>Website:</strong><br><a target="_blank" href="{{userInformation.website}}">{{userInformation.website}}</a>
+                        </div>
+
+                        <div style="padding-bottom: 20px; padding-top: 20px;">
+                            <strong>Image/video distribution</strong>
+                        </div>
+                        <canvas id="myChart" style="margin-left: -60px;"></canvas>
+                    </div>
+                </div>
+
+                <div class="textAlignCenter" data-ng-show="loading">
+                    <img src="img/spinner.gif" height="52" width="52" />
+                </div>
             </div>
-            <div class="textAlignCenter" data-ng-show="loading">
-                <img src="img/spinner.gif" height="52" width="52" />
+            <div style="width:50px; height:100%; display: inline-block; margin-left: -4px; /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,000000+100&amp;0.65+0,0+100 */
+background: -moz-linear-gradient(left,  rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(0,0,0,0.65)), color-stop(100%,rgba(0,0,0,0))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(left,  rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(left,  rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(left,  rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%); /* IE10+ */
+background: linear-gradient(to right,  rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=1 ); /* IE6-9 */
+">
+
             </div>
-       </div>
+        </div>
     </body>
 </html>
