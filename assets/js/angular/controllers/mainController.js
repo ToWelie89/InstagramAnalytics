@@ -1,5 +1,5 @@
 app.controller('mainController', ['$scope', '$log', 'instagramService', function($scope, log, instagramService) {
-	$scope.fullFlowList = [];
+    $scope.fullFlowList = [];
     $scope.loading = false;
     $scope.noUserFound = false;
     $scope.searchQuery = '';
@@ -10,6 +10,9 @@ app.controller('mainController', ['$scope', '$log', 'instagramService', function
 
     var numberOfVideos = 0;
     var numberOfImages = 0;
+
+    var filterDb = {};
+    var filterList = [];
 
     function init() {
 
@@ -70,7 +73,13 @@ app.controller('mainController', ['$scope', '$log', 'instagramService', function
             if (jsonResp.data[i].type === 'image') {
                 numberOfImages++;
             } else {
-                numberOfVideos++;    
+                numberOfVideos++;
+            }
+
+            if (filterDb.hasOwnProperty(jsonResp.data[i].filter)) {
+                filterDb[jsonResp.data[i].filter]++;
+            } else {
+                filterDb[jsonResp.data[i].filter] = 1;
             }
         }
 
@@ -83,37 +92,78 @@ app.controller('mainController', ['$scope', '$log', 'instagramService', function
         }
     };
 
-    function setupChart() {
-        var data = [
-            {
-                value: numberOfImages,
-                color:"#F7464A",
-                highlight: "#FF5A5E",
-                label: "Images"
-            },
-            {
-                value: numberOfVideos,
-                color: "#46BFBD",
-                highlight: "#5AD3D1",
-                label: "Videos"
-            }
-        ];
+    function getColor(c,n,i,d){
+        for(i=3;i--;c[i]=d<0?0:d>255?255:d|0)d=c[i]+n;return c
+    };
 
-        var ctx = document.getElementById("myChart").getContext("2d");
-        var myNewChart = new Chart(ctx).Pie(data, {
-            scaleBackdropPaddingY : 0,
-            scaleBackdropPaddingX : 0,
-            percentageInnerCutout : 0
-        });
+    function setupChart() {
+        var data = [{
+            value: numberOfImages,
+            color: '#F7464A',
+            highlight: '#FF5A5E',
+            label: 'Images'
+        }, {
+            value: numberOfVideos,
+            color: '#46BFBD',
+            highlight: '#5AD3D1',
+            label: 'Videos'
+        }];
+
+        var ctx = document.getElementById('imageVideoChart').getContext('2d');
+        var myNewChart = new Chart(ctx).Pie(data);
+
+        filterList = [];
+        for (var filter in filterDb) {
+            if (filterDb.hasOwnProperty(filter)) {
+                var r = Math.floor((Math.random() * 255) + 10);
+                var g = Math.floor((Math.random() * 255) + 10);
+                var b = Math.floor((Math.random() * 255) + 10);
+
+                var color = getColor([r, g, b], 0);
+                var highlightColor = getColor([r, g, b], -20);
+
+                r = color[0].toString(16);
+                g = color[1].toString(16);
+                b = color[2].toString(16);
+
+                r = (r.length === 1) ? ("0" + r) : r;
+                g = (g.length === 1) ? ("0" + g) : g;
+                b = (b.length === 1) ? ("0" + b) : b;
+
+                var newColor = "#" + r + g + b;
+
+                r = highlightColor[0].toString(16);
+                g = highlightColor[1].toString(16);
+                b = highlightColor[2].toString(16);
+
+                r = (r.length === 1) ? ("0" + r) : r;
+                g = (g.length === 1) ? ("0" + g) : g;
+                b = (b.length === 1) ? ("0" + b) : b;
+
+                var newHighLightColor = "#" + r + g + b;
+
+                filterList.push({
+                    value: filterDb[filter],
+                    color: newColor,
+                    highlight: newHighLightColor,
+                    label: filter
+                });
+            }
+        }
+
+        var ctx = document.getElementById('filterChart').getContext('2d');
+        var myNewChart = new Chart(ctx).Pie(filterList);
     };
 
     function convertDbToList() {
         // Tags
         var tagdbAsList = [];
-        for (var tag in tagdb)
-        {
+        for (var tag in tagdb) {
             if (tagdb.hasOwnProperty(tag)) {
-                tagdbAsList.push({ name: tag, value: tagdb[tag] });
+                tagdbAsList.push({
+                    name: tag,
+                    value: tagdb[tag]
+                });
             }
         }
 
@@ -150,6 +200,7 @@ app.controller('mainController', ['$scope', '$log', 'instagramService', function
         tagdb = new Object();
         $scope.imagedb = [];
         $scope.fullFlowList = [];
+        filterList = [];
 
         numberOfVideos = 0;
         numberOfImages = 0;
@@ -163,8 +214,7 @@ app.controller('mainController', ['$scope', '$log', 'instagramService', function
             var encodedResponse = JSON.parse(encodedResponse);
             log.debug(encodedResponse);
 
-            if (encodedResponse.data.length === 0)
-            {
+            if (encodedResponse.data.length === 0) {
                 $scope.noUserFound = true;
             } else {
                 var found = false;
