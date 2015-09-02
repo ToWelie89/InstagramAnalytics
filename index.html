@@ -19,7 +19,7 @@
         </title>
     </head>
     <body data-ng-app="instaAnalyzeApp" data-ng-controller="mainController">
-        <div style="margin: auto; height: 100%; padding: 0px;width: 828px;">
+        <div id="outerContainer">
             <div id="leftGradient"></div>
             <div id="main">
                 <p id="sizeIndicator"></p>
@@ -30,65 +30,65 @@
                     Made by <a href="http://www.martinsonesson.se" target="_blank">Martin Sonesson</a>
                 </h6>
                 
-                <div style="padding-bottom: 20px; margin-top:10px;">
+                <div class="paddingBottom" style="margin-top:10px;">
                     <form>
-                        <input id="searchInput" class="form-control" style="width: 70%;" type="text" placeholder="Instagram username" data-ng-model="searchQuery"></input>
-                        <button id="searchButton" class="form-control" data-ng-click="search()" data-ng-disabled="loading">Search</button>
+                        <input id="searchInput" class="form-control" type="text" placeholder="Instagram username" data-ng-model="searchQuery"></input>
+                        <button id="searchButton" class="form-control" data-ng-click="search()" data-ng-disabled="loading"><p style="margin: 0;">Search</p></button>
                     </form>
                     <span data-ng-show="noUserFound">No user found</span>
                 </div>
 
                 <div data-ng-show="userId && !loading">
                     <div id="column1">
-                        <div style="padding-bottom: 20px;">
+                        <div class="paddingBottom">
                             <strong>User information</strong>
                         </div>
-                        <img data-ng-src="{{userInformation.profile_picture}}" style="border-radius: 10px; width: 100px; margin-bottom: 20px;" />
-                        <div>
+                        <img class="marginBottom" data-ng-src="{{userInformation.profile_picture}}" style="border-radius: 10px; width: 100px;" />
+                        <div data-ng-show="userInformation.full_name">
                             <strong>Full name:</strong><br>{{userInformation.full_name}}
                         </div>
                         <div data-ng-show="userInformation.bio">
                             <strong>Bio:</strong><br>{{userInformation.bio}}
                         </div>
-                        <div data-ng-show="userInformation.website">
+                        <div data-ng-show="userInformation.website" style="word-wrap: break-word;">
                             <strong>Website:</strong><br><a target="_blank" href="{{userInformation.website}}">{{userInformation.website}}</a>
                         </div>
 
-                        <div style="padding-bottom: 20px; padding-top: 20px;">
+                        <div class="paddingBottom" style="padding-top: 20px;">
                             <strong>Image/video distribution</strong>
                         </div>
                         <canvas id="imageVideoChart" style="margin-left: -60px;"></canvas>
-                        <div style="padding-bottom: 20px; padding-top: 20px;">
+                        <div class="paddingBottom paddingTop">
                             <strong>Filter usage</strong>
                         </div>
                         <canvas id="filterChart" style="margin-left: -60px;"></canvas>
                     </div>
                     <div id="column2">
-                        <div style="padding-bottom: 20px;">
+                        <div class="paddingBottom">
                             <strong>Most popular content</strong>
                         </div>
                         <div data-ng-repeat="image in imagedb | limitTo:5" style="width: 150px;">
                             <a href="{{image.link}}" target="_blank">
-                                <div style="background: url({{image.thumbnail}}); height: 150px; width: 150px; padding-left: 0px; padding-top: 3px;" class="thumbnail">
+                                <div style="background: url({{image.thumbnail}}); background-position: center center;" class="thumbnail">
                                     <span style="padding: 5px; color: white; background: darkgray; border-bottom-right-radius: 4px;">{{image.count}}</span>
                                 </div>
                             </a>
                         </div>
                     </div>
                     <div id="column3">
-                        <div style="padding-bottom: 20px;">
+                        <div class="paddingBottom">
                             <strong>Counts</strong>
                         </div>
-                        <div style="padding-bottom: 20px;">
+                        <div class="paddingBottom">
                             <strong>Follows:</strong> {{userInformation.counts.follows}}<br>
                             <strong>Followers:</strong> {{userInformation.counts.followed_by}}<br>
                             <strong>Content count:</strong> {{userInformation.counts.media}}
                         </div>
-                        <div style="padding-bottom: 20px;">
+                        <div class="paddingBottom">
                             <strong>Most used hashtags</strong>
                         </div>
                         <div style="" data-ng-cloak>
-                            <div data-ng-repeat="tag in fullFlowList | limitTo: 30">
+                            <div data-ng-repeat="tag in fullFlowList | limitTo: 25">
                                 <span data-ng-bind="tag.name"></span> - <span data-ng-bind="tag.value"></span>
                             </div>
                         </div>

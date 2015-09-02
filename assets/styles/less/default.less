@@ -1,5 +1,17 @@
 /* This is the standard stylings, used for large */
 
+.paddingBottom {
+    padding-bottom: @gutter;
+}
+
+.paddingTop {
+    padding-top: @gutter;
+}
+
+.marginBottom {
+    margin-bottom: @gutter;
+}
+
 @font-face
 {
     font-family: 'TestFont';
@@ -38,12 +50,17 @@ h1 {
     letter-spacing: 2px;
     display: inline-block;
     font-size: 32px;
+    color: white;
 }
 
 h6 {
     display: inline-block;
     float: right;
     margin-top: 25px;
+    font-family: 'Orbitron', sans-serif;
+}
+
+p {
     font-family: 'Orbitron', sans-serif;
 }
 
@@ -63,26 +80,20 @@ div#main{
     width: @containerWidth;
     background-color: #6E739E;
     padding: @gutter;
-    padding-bottom: 20px;
+    padding-bottom: @gutter;
     padding-top: 2px;
     width: containerWidth;
-    height:100%;
+    min-height:100%;
     display: inline-block;
     vertical-align: top;
-}
-
-h1 {
-    color: white;
 }
 
 #sizeIndicator:before{
     color: white;
     display: none;
     content: "LARGE";
-}
-
-button:disabled {
-    color: darkgray;
+    position: absolute;
+    left: 0;
 }
 
 .thumbnail {
@@ -127,11 +138,19 @@ button:disabled {
 #searchInput {
     width: 70%;
     display: inline-block;
+    font-family: 'Orbitron', sans-serif;
 }
 
 #searchButton {
-    width: 25%;
+    width: 28%;
     display: inline-block;
+    background: #9695FB;
+    &:hover {
+        background: #7977EF
+    }
+    &:disabled {
+        color: gray;
+    }
 }
 
 #column1 {
@@ -156,4 +175,19 @@ button:disabled {
 
 .loading {
     .textAlignCenter;
+    margin-top: 50px;
+}
+
+#outerContainer {
+    margin: auto;
+    height: 100%;
+    padding: 0px;
+    width: 828px;
+}
+
+.thumbnail {
+    height: 150px;
+    width: 150px;
+    padding-left: 0px;
+    padding-top: 3px;
 }

@@ -14,12 +14,21 @@ app.controller('mainController', ['$scope', '$log', 'instagramService', function
     var filterDb = {};
     var filterList = [];
 
-    function init() {
+    var myNewChart;
+    var filterChart;
 
+    var ctx1;
+    var ctx2;
+
+    function init() {
+        ctx1 = document.getElementById('imageVideoChart').getContext('2d');
+        ctx2 = document.getElementById('filterChart').getContext('2d');
+
+        myNewChart = new Chart(ctx1).Pie();
+        filterChart = new Chart(ctx2).Pie();
     };
 
     function getInitialFlowForUser() {
-        $scope.loading = true;
         var promise = instagramService.getInitialSelfFlow($scope.userId);
 
         var successCallback = function(response) {
@@ -97,6 +106,9 @@ app.controller('mainController', ['$scope', '$log', 'instagramService', function
     };
 
     function setupChart() {
+        myNewChart.destroy();
+        filterChart.destroy();
+
         var data = [{
             value: numberOfImages,
             color: '#F7464A',
@@ -108,9 +120,6 @@ app.controller('mainController', ['$scope', '$log', 'instagramService', function
             highlight: '#5AD3D1',
             label: 'Videos'
         }];
-
-        var ctx = document.getElementById('imageVideoChart').getContext('2d');
-        var myNewChart = new Chart(ctx).Pie(data);
 
         filterList = [];
         for (var filter in filterDb) {
@@ -151,8 +160,8 @@ app.controller('mainController', ['$scope', '$log', 'instagramService', function
             }
         }
 
-        var ctx = document.getElementById('filterChart').getContext('2d');
-        var myNewChart = new Chart(ctx).Pie(filterList);
+        myNewChart = new Chart(ctx1).Pie(data);
+        filterChart = new Chart(ctx2).Pie(filterList);
     };
 
     function convertDbToList() {
@@ -227,6 +236,7 @@ app.controller('mainController', ['$scope', '$log', 'instagramService', function
                 }
                 if (!found) {
                     $scope.noUserFound = true;
+                    $scope.loading = false;
                 }
             }
         };
@@ -239,6 +249,7 @@ app.controller('mainController', ['$scope', '$log', 'instagramService', function
     };
 
     $scope.search = function() {
+        $scope.loading = true;
         searchForUser($scope.searchQuery);
     };
 
