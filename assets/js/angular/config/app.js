@@ -1,3 +1,5 @@
 'use strict';
 
-var app = angular.module('instaAnalyzeApp', []);
+(function() {
+    var app = angular.module('instaAnalyzeApp', []);
+}());
