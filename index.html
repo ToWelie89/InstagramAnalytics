@@ -1,19 +1,20 @@
 <!DOCTYPE html>
-<html xmlns="http:/www.w3.org/1999/xhtml" lang="sv">
+<html xmlns="http:/www.w3.org/1999/xhtml" lang="en">
     <head>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta charset="utf-8"/>
         <link href='https://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet' type='text/css'>
+        <!-- LIBS -->
         <script src="assets/js/libs/Chart.js"></script>
         <script src="assets/js/libs/jquery-2.1.1.min.js"></script>
-        <script src="assets/js/libs/angular.min.js"></script>
-        <script src="assets/js/angular/config/app.js"></script>
-        <script src="assets/js/angular/services/instagramService.js"></script>
-        <script src="assets/js/angular/controllers/mainController.js"></script>
+        <script src="node_modules/angular/angular.min.js"></script>
+        <!-- JS -->
+        <script src="build/instagramAnalytics.min.js"></script>
+        <!-- CSS -->
         <link rel="stylesheet" type="text/css" href="assets/styles/bootstrap.css">
         <link rel="stylesheet" type="text/css" href="assets/styles/bootstrap-theme.css">
-        <link rel="stylesheet" type="text/css" href="assets/styles/default.css">
+        <link rel="stylesheet" type="text/css" href="build/default.css">
         <title>
             Instagram Analyzer
         </title>
@@ -29,7 +30,7 @@
                 <h6>
                     Made by <a href="http://www.martinsonesson.se" target="_blank">Martin Sonesson</a>
                 </h6>
-                
+
                 <div class="paddingBottom" style="margin-top:10px;">
                     <form>
                         <input id="searchInput" class="form-control" type="text" placeholder="Instagram username" data-ng-model="searchQuery"></input>
@@ -38,12 +39,12 @@
                     <span data-ng-show="noUserFound">No user found</span>
                 </div>
 
-                <div data-ng-show="userId && !loading">
+                <div data-ng-show="userId && !loading && !noUserFound">
                     <div id="column1">
                         <div class="paddingBottom">
                             <strong>User information</strong>
                         </div>
-                        <img class="marginBottom" data-ng-src="{{userInformation.profile_picture}}" style="border-radius: 10px; width: 100px;" />
+                        <img class="marginBottom profilePicture" data-ng-src="{{userInformation.profile_picture}}" />
                         <div data-ng-show="userInformation.full_name">
                             <strong>Full name:</strong><br>{{userInformation.full_name}}
                         </div>
@@ -94,12 +95,12 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="loading" data-ng-show="loading">
                     <img src="img/spinner.gif" height="52" width="52" />
                 </div>
             </div>
-            <div id="rightGradient"></div>
+            <div id="rightGradient">
+            </div>
         </div>
     </body>
 </html>

@@ -1,7 +1,7 @@
 (function() {
-    var app = angular.module("instaAnalyzeApp");
+    var app = angular.module('instaAnalyzeApp');
 
-    var mainController = ['$scope', '$log', 'instagramService', function($scope, log, instagramService) {
+    var mainController = ['$scope', '$log', 'instagramService', 'colorService', function($scope, log, instagramService, colorService) {
         $scope.fullFlowList = [];
         $scope.loading = false;
         $scope.noUserFound = false;
@@ -23,7 +23,11 @@
         var ctx1;
         var ctx2;
 
+        // PUBLIC FUNCTIONS
+        $scope.search = search;
+
         function init() {
+            // Initialize charts
             ctx1 = document.getElementById('imageVideoChart').getContext('2d');
             ctx2 = document.getElementById('filterChart').getContext('2d');
 
@@ -31,12 +35,18 @@
             filterChart = new Chart(ctx2).Pie();
         };
 
+        function getParsedData(data) {
+            // For some weird reason the data isn't correctly encoded unless I parse twice :( Will use this ugly solution in the meantime
+            var encodedResponse = JSON.parse(data);
+            var encodedResponse = JSON.parse(encodedResponse);
+            return encodedResponse;
+        }
+
         function getInitialFlowForUser() {
             var promise = instagramService.getInitialSelfFlow($scope.userId);
 
             var successCallback = function(response) {
-                var encodedResponse = JSON.parse(response.data);
-                var encodedResponse = JSON.parse(encodedResponse);
+                var encodedResponse = getParsedData(response.data);
                 log.debug(encodedResponse);
                 addToFlow(encodedResponse);
             };
@@ -52,8 +62,7 @@
             var promise = instagramService.getSelfFlowWithMaxId($scope.userId, nextMaxId);
 
             var successCallback = function(response) {
-                var encodedResponse = JSON.parse(response.data);
-                var encodedResponse = JSON.parse(encodedResponse);
+                var encodedResponse = getParsedData(response.data);
                 log.debug(encodedResponse);
                 addToFlow(encodedResponse);
             };
@@ -131,33 +140,13 @@
                     var g = Math.floor((Math.random() * 255) + 10);
                     var b = Math.floor((Math.random() * 255) + 10);
 
-                    var color = getColor([r, g, b], 0);
-                    var highlightColor = getColor([r, g, b], -20);
-
-                    r = color[0].toString(16);
-                    g = color[1].toString(16);
-                    b = color[2].toString(16);
-
-                    r = (r.length === 1) ? ("0" + r) : r;
-                    g = (g.length === 1) ? ("0" + g) : g;
-                    b = (b.length === 1) ? ("0" + b) : b;
-
-                    var newColor = "#" + r + g + b;
-
-                    r = highlightColor[0].toString(16);
-                    g = highlightColor[1].toString(16);
-                    b = highlightColor[2].toString(16);
-
-                    r = (r.length === 1) ? ("0" + r) : r;
-                    g = (g.length === 1) ? ("0" + g) : g;
-                    b = (b.length === 1) ? ("0" + b) : b;
-
-                    var newHighLightColor = "#" + r + g + b;
+                    var color = colorService.getColorAsHex([r, g, b], 0);
+                    var highlightColor = colorService.getColorAsHex([r, g, b], -20);
 
                     filterList.push({
                         value: filterDb[filter],
-                        color: newColor,
-                        highlight: newHighLightColor,
+                        color: color,
+                        highlight: highlightColor,
                         label: filter
                     });
                 }
@@ -194,8 +183,7 @@
             var promise = instagramService.getUserInformation(userId);
 
             var successCallback = function(response) {
-                var encodedResponse = JSON.parse(response.data);
-                var encodedResponse = JSON.parse(encodedResponse);
+                var encodedResponse = getParsedData(response.data);
                 log.debug(encodedResponse);
 
                 $scope.userInformation = encodedResponse.data;
@@ -222,8 +210,7 @@
             var successCallback = function(response) {
                 $scope.noUserFound = false;
 
-                var encodedResponse = JSON.parse(response.data);
-                var encodedResponse = JSON.parse(encodedResponse);
+                var encodedResponse = getParsedData(response.data);
                 log.debug(encodedResponse);
 
                 if (encodedResponse.data.length === 0) {
@@ -252,9 +239,14 @@
             return promise.then(successCallback, errorCallback);
         };
 
-        $scope.search = function() {
+        function clearPreviousData() {
+            $scope.userInformation = {};
+        }
+
+        function search() {
             $scope.loading = true;
-            searchForUser($scope.searchQuery);
+            clearPreviousData();
+            searchForUser($scope.searchQuery.toLowerCase());
         };
 
         function fullFlowListSort(a, b) {
@@ -268,5 +260,5 @@
         init();
     }];
 
-    app.controller("mainController", mainController);
+    app.controller('mainController', mainController);
 }());

@@ -1,4 +1,8 @@
 <?php
+	// The file secret.php is included in .gitignore so it is not uploaded to the Git repository
+	// This file only contains one variable, $accessToken
+	// If you clone this repo you need to create the secret.php file and generate your own accessToken variable
+	// See: https://www.instagram.com/developer/authentication/
 	include("secret.php");
 
 	if (isset($_POST["action"]))
