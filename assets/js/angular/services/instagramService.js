@@ -1,5 +1,5 @@
 (function() {
-    var app = angular.module("instagramService");
+    var app = angular.module("instaAnalyzeApp");
 
     var instagramService = ['$q', '$log', '$http', function($q, log, $http) {
         var getInitialSelfFlow = function(userId) {
@@ -9,7 +9,7 @@
                     data: $.param({
                         userId: userId
                     }),
-                    headers: { 
+                    headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 }).
@@ -29,7 +29,7 @@
                         maxId: maxId,
                         userId: userId
                     }),
-                    headers: { 
+                    headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 }).
@@ -49,7 +49,7 @@
                         action: "search",
                         query: query
                     }),
-                    headers: { 
+                    headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 }).
@@ -69,7 +69,7 @@
                         action: "getUserInformation",
                         userId: userId
                     }),
-                    headers: { 
+                    headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 }).
