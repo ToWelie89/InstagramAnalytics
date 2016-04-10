@@ -20,3 +20,5 @@ grunt
     $accessToken = "<your access token that you generate using Instagram API, check their docs>";
 ?>
 ```
+
+The file instagramService.php in the model-folder contains the calls to Instagrams API for fetching data. Since php is used you may need software like WAMP/LAMP server to run locally.
