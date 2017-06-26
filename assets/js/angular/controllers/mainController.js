@@ -36,9 +36,7 @@
         };
 
         function getParsedData(data) {
-            // For some weird reason the data isn't correctly encoded unless I parse twice :( Will use this ugly solution in the meantime
-            var encodedResponse = JSON.parse(data);
-            var encodedResponse = JSON.parse(encodedResponse);
+            var encodedResponse = data;
             return encodedResponse;
         }
 
