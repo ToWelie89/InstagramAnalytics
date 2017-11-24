@@ -2,13 +2,10 @@
     var app = angular.module('instaAnalyzeApp');
 
     var instagramService = ['$q', '$log', '$http', function($q, log, $http) {
-        var getInitialSelfFlow = function(userId) {
+        var getUserData = function(userName) {
             return $http({
-                    url: './model/instagramService.php',
-                    method: 'POST',
-                    data: $.param({
-                        userId: userId
-                    }),
+                    url: 'https://igpi.ga/' + userName + '/?__a=1',
+                    method: 'GET',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
@@ -17,18 +14,14 @@
                     return data;
                 }).
                 error(function(data, status, headers, config) {
-                    log.error('getInitialSelfFlow fail');
+                    log.error('getUserData fail');
                 });
         };
 
-        var getSelfFlowWithMaxId = function(userId, maxId) {
+        var getUserDataWithMaxId = function(userName, nextMaxId) {
             return $http({
-                    url: './model/instagramService.php',
-                    method: 'POST',
-                    data: $.param({
-                        maxId: maxId,
-                        userId: userId
-                    }),
+                    url: 'https://igpi.ga/' + userName + '/?__a=1&max_id=' + nextMaxId,
+                    method: 'GET',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
@@ -37,63 +30,17 @@
                     return data;
                 }).
                 error(function(data, status, headers, config) {
-                    log.error('getSelfFlowWithMaxId fail');
-                });
-        };
-
-        var searchForUser = function(query) {
-            return $http({
-                    url: './model/instagramService.php',
-                    method: 'POST',
-                    data: $.param({
-                        action: 'search',
-                        query: query
-                    }),
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                }).
-                success(function(data, status, headers, config) {
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    log.error('searchForUser fail');
-                });
-        };
-
-        var getUserInformation = function(userId) {
-            return $http({
-                    url: './model/instagramService.php',
-                    method: 'POST',
-                    data: $.param({
-                        action: 'getUserInformation',
-                        userId: userId
-                    }),
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                }).
-                success(function(data, status, headers, config) {
-                    return data;
-                }).
-                error(function(data, status, headers, config) {
-                    log.error('getUserInformation fail');
+                    log.error('getUserDataWithMaxId fail');
                 });
         };
 
         return {
-            getInitialSelfFlow: function(userId) {
-                return getInitialSelfFlow(userId);
+            getUserData: function(userName) {
+                return getUserData(userName);
             },
-            getSelfFlowWithMaxId: function(userId, maxId) {
-                return getSelfFlowWithMaxId(userId, maxId);
-            },
-            searchForUser: function(query) {
-                return searchForUser(query);
-            },
-            getUserInformation: function(userId) {
-                return getUserInformation(userId);
-            },
+            getUserDataWithMaxId: function(userName, nextMaxId) {
+                return getUserDataWithMaxId(userName, nextMaxId);
+            }
         };
     }];
 

@@ -6,14 +6,14 @@
         <meta charset="utf-8"/>
         <link href='https://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet' type='text/css'>
         <!-- LIBS -->
-        <script src="assets/js/libs/Chart.js"></script>
+        <script src="node_modules/chart.js/dist/Chart.min.js"></script>
         <script src="assets/js/libs/jquery-2.1.1.min.js"></script>
         <script src="node_modules/angular/angular.min.js"></script>
         <!-- JS -->
         <script src="build/instagramAnalytics.min.js"></script>
         <!-- CSS -->
-        <link rel="stylesheet" type="text/css" href="assets/styles/bootstrap.css">
-        <link rel="stylesheet" type="text/css" href="assets/styles/bootstrap-theme.css">
+        <link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap-theme.min.css">
         <link rel="stylesheet" type="text/css" href="build/default.css">
         <title>
             Instagram Analyzer
@@ -33,13 +33,13 @@
 
                 <div class="paddingBottom" style="margin-top:10px;">
                     <form>
-                        <input id="searchInput" class="form-control" type="text" placeholder="Instagram username" data-ng-model="searchQuery"></input>
+                        <input id="searchInput" class="form-control" type="text" placeholder="Instagram username" data-ng-model="username"></input>
                         <button id="searchButton" class="form-control" data-ng-click="search()" data-ng-disabled="loading"><p style="margin: 0;">Search</p></button>
                     </form>
-                    <span data-ng-show="noUserFound">No user found</span>
+                    <span data-ng-show="noUserFound && !loading && searchHasBeenTriggered">No user found</span>
                 </div>
 
-                <div data-ng-show="userId && !loading && !noUserFound">
+                <div data-ng-show="username && !loading && !noUserFound">
                     <div id="column1">
                         <div class="paddingBottom">
                             <strong>User information</strong>
@@ -55,23 +55,25 @@
                             <strong>Website:</strong><br><a target="_blank" href="{{userInformation.website}}">{{userInformation.website}}</a>
                         </div>
 
-                        <div class="paddingBottom" style="padding-top: 20px;">
+                        <div class="paddingBottom" style="padding-top: 20px;" data-ng-show="!userIsPrivate">
                             <strong>Image/video distribution</strong>
                         </div>
-                        <canvas id="imageVideoChart" style="margin-left: -60px;"></canvas>
-                        <div class="paddingBottom paddingTop">
-                            <strong>Filter usage</strong>
-                        </div>
-                        <canvas id="filterChart" style="margin-left: -60px;"></canvas>
+                        <canvas data-ng-show="!userIsPrivate" id="imageVideoChart" style="margin-left: -60px;"></canvas>
                     </div>
                     <div id="column2">
                         <div class="paddingBottom">
                             <strong>Most popular content</strong>
                         </div>
+                        <div data-ng-show="userIsPrivate">
+                            This user has a private account. Therefore you cannot see its contents.
+                        </div>
                         <div data-ng-repeat="image in imagedb | limitTo:5" style="width: 150px;">
                             <a href="{{image.link}}" target="_blank">
                                 <div style="background: url({{image.thumbnail}}); background-position: center center;" class="thumbnail">
-                                    <span style="padding: 5px; color: white; background: darkgray; border-bottom-right-radius: 4px;">{{image.count}}</span>
+                                    <span style="padding: 5px; color: white; background: darkgray; border-bottom-right-radius: 4px;">
+                                        {{image.count}}
+                                        <span class="glyphicon glyphicon-heart" style="color: red;"></span>
+                                    </span>
                                 </div>
                             </a>
                         </div>
@@ -81,17 +83,9 @@
                             <strong>Counts</strong>
                         </div>
                         <div class="paddingBottom">
-                            <strong>Follows:</strong> {{userInformation.counts.follows}}<br>
-                            <strong>Followers:</strong> {{userInformation.counts.followed_by}}<br>
-                            <strong>Content count:</strong> {{userInformation.counts.media}}
-                        </div>
-                        <div class="paddingBottom">
-                            <strong>Most used hashtags</strong>
-                        </div>
-                        <div style="" data-ng-cloak>
-                            <div data-ng-repeat="tag in fullFlowList | limitTo: 25">
-                                <span data-ng-bind="tag.name"></span> - <span data-ng-bind="tag.value"></span>
-                            </div>
+                            <strong>Follows:</strong> {{userInformation.follows}}<br>
+                            <strong>Followers:</strong> {{userInformation.followed_by}}<br>
+                            <strong>Content count:</strong> {{userInformation.contentCount}}
                         </div>
                     </div>
                 </div>
