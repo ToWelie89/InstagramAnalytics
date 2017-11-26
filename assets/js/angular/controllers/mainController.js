@@ -1,13 +1,16 @@
 (function() {
     var app = angular.module('instaAnalyzeApp');
 
-    var mainController = ['$scope', '$log', 'instagramService', 'colorService', function($scope, log, instagramService, colorService) {
+    var mainController = ['$scope', '$timeout', '$log', 'instagramService', 'colorService', function($scope, $timeout, log, instagramService, colorService) {
         $scope.loading = false;
         $scope.noUserFound = true;
         $scope.searchHasBeenTriggered = false;
         $scope.username = '';
         $scope.imagedb = [];
         $scope.userInformation = {};
+        $scope.likesListLimit = 5;
+        $scope.commentsListLimit = 5;
+        $scope.progress = 0;
 
         var numberOfVideos = 0;
         var numberOfImages = 0;
@@ -48,7 +51,11 @@
                     if (encodedResponse.user.media.count > 0 && !$scope.userIsPrivate) {
                         addToFlow(encodedResponse);
                     } else {
-                        $scope.loading = false;
+                        $scope.progress = 100;
+
+                        $timeout(function () {
+                            $scope.loading = false;
+                        }, 500);
                     }
                 } else {
                     $scope.loading = false;
@@ -75,6 +82,8 @@
             };
 
             var errorCallback = function() {
+                $scope.loading = false;
+                $scope.error = true;
                 log.error(':(');
             };
 
@@ -86,7 +95,8 @@
             for (var i = 0; i < data.length; i++) {
                 $scope.imagedb.push({
                     id: data[i].id,
-                    count: data[i].likes.count,
+                    likes: data[i].likes.count,
+                    comments: data[i].comments.count,
                     thumbnail: data[i].thumbnail_src,
                     link: 'https://www.instagram.com/p/' + data[i].code
                 });
@@ -98,12 +108,14 @@
                 } else if (data[i].__typename === 'GraphSidecar') {
                     numberOfGalleries++;
                 }
+
+                $scope.progress = Math.ceil($scope.imagedb.length * 100 / $scope.userInformation.contentCount);
             }
 
             if (jsonResp.user.media.page_info && jsonResp.user.media.page_info.has_next_page) {
                 getNextPage(jsonResp.user.media.page_info.end_cursor);
             } else {
-                $scope.imagedb.sort(imageListSort);
+                //$scope.imagedb.sort(imageListSort);
                 console.log($scope.imagedb);
                 $scope.loading = false;
                 setTimeout(setupChart, 500);
@@ -150,17 +162,18 @@
         function clearPreviousData() {
             $scope.imagedb = [];
             $scope.userInformation = {};
+            $scope.likesListLimit = 5;
+            $scope.commentsListLimit = 5;
+            $scope.progress = 0;
+            $scope.error = false;
         }
 
         function search() {
             $scope.searchHasBeenTriggered = true;
             $scope.loading = true;
+            $scope.error = false;
             clearPreviousData();
             getInitialFlowForUser($scope.username.toLowerCase());
-        };
-
-        function imageListSort(a, b) {
-            return (b.count - a.count)
         };
     }];
 

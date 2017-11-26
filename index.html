@@ -44,7 +44,9 @@
                         <div class="paddingBottom">
                             <strong>User information</strong>
                         </div>
-                        <img class="marginBottom profilePicture" data-ng-src="{{userInformation.profile_picture}}" />
+                        <a href="http://www.instagram.com/{{ username }}">
+                            <img class="marginBottom profilePicture" data-ng-src="{{userInformation.profile_picture}}" />
+                        </a>
                         <div data-ng-show="userInformation.full_name">
                             <strong>Full name:</strong><br>{{userInformation.full_name}}
                         </div>
@@ -56,41 +58,58 @@
                         </div>
 
                         <div class="paddingBottom" style="padding-top: 20px;" data-ng-show="!userIsPrivate">
-                            <strong>Image/video distribution</strong>
+                            <strong>Image/video/gallery distribution</strong>
                         </div>
                         <canvas data-ng-show="!userIsPrivate" id="imageVideoChart" style="margin-left: -60px;"></canvas>
-                    </div>
-                    <div id="column2">
-                        <div class="paddingBottom">
-                            <strong>Most popular content</strong>
-                        </div>
-                        <div data-ng-show="userIsPrivate">
-                            This user has a private account. Therefore you cannot see its contents.
-                        </div>
-                        <div data-ng-repeat="image in imagedb | limitTo:5" style="width: 150px;">
-                            <a href="{{image.link}}" target="_blank">
-                                <div style="background: url({{image.thumbnail}}); background-position: center center;" class="thumbnail">
-                                    <span style="padding: 5px; color: white; background: darkgray; border-bottom-right-radius: 4px;">
-                                        {{image.count}}
-                                        <span class="glyphicon glyphicon-heart" style="color: red;"></span>
-                                    </span>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <div id="column3">
-                        <div class="paddingBottom">
-                            <strong>Counts</strong>
-                        </div>
-                        <div class="paddingBottom">
+
+                        <div class="paddingBottom paddingTop">
                             <strong>Follows:</strong> {{userInformation.follows}}<br>
                             <strong>Followers:</strong> {{userInformation.followed_by}}<br>
                             <strong>Content count:</strong> {{userInformation.contentCount}}
                         </div>
                     </div>
+                    <div id="column2">
+                        <div class="paddingBottom">
+                            <strong>Most liked posts</strong>
+                        </div>
+                        <div data-ng-show="userIsPrivate">
+                            This user has a private account. Therefore you cannot see its contents.
+                        </div>
+                        <div data-ng-repeat="image in imagedb | orderBy: 'likes':true | limitTo: likesListLimit" style="width: 150px;">
+                            <a href="{{image.link}}" target="_blank">
+                                <div style="background: url({{image.thumbnail}}); background-position: center center;" class="thumbnail">
+                                    <span style="padding: 5px; color: white; background: darkgray; border-bottom-right-radius: 4px;">
+                                        {{image.likes}}
+                                        <span class="glyphicon glyphicon-heart" style="color: red;"></span>
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
+                        <a href="" data-ng-click="likesListLimit = likesListLimit + 5" data-ng-show="!userIsPrivate">Show more</a>
+                    </div>
+                    <div id="column3">
+                        <div class="paddingBottom">
+                            <strong>Most commented posts</strong>
+                        </div>
+                        <div data-ng-repeat="image in imagedb | orderBy: 'comments':true | limitTo: commentsListLimit" style="width: 150px;">
+                            <a href="{{image.link}}" target="_blank">
+                                <div style="background: url({{image.thumbnail}}); background-position: center center;" class="thumbnail">
+                                    <span style="padding: 5px; color: white; background: darkgray; border-bottom-right-radius: 4px;">
+                                        {{image.comments}}
+                                        <span class="glyphicon glyphicon-comment" style="color: yellow;"></span>
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
+                        <a href="" data-ng-click="commentsListLimit = commentsListLimit + 5" data-ng-show="!userIsPrivate">Show more</a>
+                    </div>
                 </div>
                 <div class="loading" data-ng-show="loading">
-                    <img src="img/spinner.gif" height="52" width="52" />
+                    <div class="loadingBar">
+                        <p>{{progress}}%</p>
+                        <div class="progressBar" style="width: {{ progress }}%;">
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="rightGradient">

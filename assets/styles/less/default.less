@@ -27,6 +27,12 @@
 .profilePicture {
     border-radius: 10px;
     width: 100px;
+    box-shadow: 6px 6px 10px rgba(43, 40, 40, 0.85);
+    transition: box-shadow 0.5s ease;
+
+    &:hover {
+        box-shadow: 6px 6px 50px rgba(191, 191, 191, 0.85);
+    }
 }
 
 .textAlignCenter {
@@ -40,10 +46,10 @@
 
 a {
     text-decoration: none !important;
-    color: #004D90;
+    color: #024279;
 
     &:hover {
-        color: #0A76D4;
+        color: #90aec7;
     }
 }
 
@@ -113,6 +119,7 @@ div#main{
     padding-top: 3px;
     background-position: center center;
     background-size: 100% 100% !important;
+    box-shadow: 6px 6px 10px rgba(43, 40, 40, 0.85);
 
     &:hover {
         opacity: 1.0;
@@ -192,6 +199,27 @@ div#main{
 .loading {
     .textAlignCenter;
     margin-top: 50px;
+
+    .loadingBar {
+        width: 80%;
+        margin: 0 auto;
+        height: 30px;
+        border-radius: 10px;
+        background: linear-gradient(to bottom,#f1f1f1,#c3bebe);
+        border: 3px solid #353232;
+        overflow: hidden;
+
+        p {
+            position: fixed;
+            left: 48%;
+        }
+
+        .progressBar {
+            transition: width 0.5s ease;
+            height: 100%;
+            background: linear-gradient(to bottom,#85f191,#2e8027);
+        }
+    }
 }
 
 #outerContainer {
