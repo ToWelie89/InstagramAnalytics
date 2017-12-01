@@ -28,6 +28,19 @@ module.exports = function(grunt) {
         },
         clean: {
             img: ['build/*']
+        },
+        browserify: {
+            build: {
+                files: {
+                    'build/app.bundle.js': 'assets/js/app.js'
+                },
+                options: {
+                    transform: [['babelify', { presets: "es2015" }]],
+                    browserifyOptions: {
+                        debug: true
+                    }
+                }
+            }
         }
     });
 
@@ -35,11 +48,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-browserify');
 
     // Default task(s).
     grunt.registerTask('default', [
         'clean', // Clean previous build files
-        'uglify', // Minify and uglify css and put it in build folder
+        'browserify:build', // Minify and uglify css and put it in build folder
         'less', // Compile CSS files and put them in build folder
     ]);
 
