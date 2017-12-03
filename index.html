@@ -10,6 +10,7 @@
         <script src="assets/js/libs/jquery-2.1.1.min.js"></script>
         <script src="node_modules/angular/angular.min.js"></script>
         <!-- JS -->
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDB6xxVP1bmTfzoFHz2w0kX7rYW_xKZPNA" async defer></script>
         <script src="build/app.bundle.js"></script>
         <!-- CSS -->
         <link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
@@ -33,81 +34,104 @@
 
                 <div class="paddingBottom" style="margin-top:10px;">
                     <form>
-                        <input id="searchInput" class="form-control" type="text" placeholder="Instagram username" data-ng-model="main.username"></input>
+                        <input id="searchInput" class="form-control" type="text" placeholder="Instagram username" data-ng-model="main.username" data-ng-disabled="main.loading"></input>
                         <button id="searchButton" class="form-control" data-ng-click="main.search()" data-ng-disabled="main.loading"><p style="margin: 0;">Search</p></button>
                     </form>
                     <span data-ng-show="main.noUserFound && !main.loading && main.searchHasBeenTriggered">No user found</span>
                 </div>
 
                 <div data-ng-show="main.username && !main.loading && !main.noUserFound">
-                    <div id="column1">
-                        <div class="paddingBottom">
-                            <strong>User information</strong>
+                    <div class="row">
+                        <div id="column1">
+                            <div class="paddingBottom">
+                                <strong>User information</strong>
+                            </div>
+                            <a href="http://www.instagram.com/{{ main.username }}" target="_blank">
+                                <img class="marginBottom profilePicture" data-ng-src="{{main.userInformation.profile_picture}}" />
+                            </a>
+                            <div data-ng-show="main.userInformation.full_name">
+                                <strong>Full name:</strong><br>{{main.userInformation.full_name}}
+                            </div>
+                            <div data-ng-show="main.userInformation.bio">
+                                <strong>Bio:</strong><br>{{main.userInformation.bio}}
+                            </div>
+                            <div data-ng-show="main.userInformation.website" style="word-wrap: break-word;">
+                                <strong>Website:</strong><br><a target="_blank" href="{{main.userInformation.website}}">{{main.userInformation.website}}</a>
+                            </div>
                         </div>
-                        <a href="http://www.instagram.com/{{ username }}">
-                            <img class="marginBottom profilePicture" data-ng-src="{{main.userInformation.profile_picture}}" />
-                        </a>
-                        <div data-ng-show="main.userInformation.full_name">
-                            <strong>Full name:</strong><br>{{userInformation.full_name}}
+                        <div id="column2">
+                            <div class="paddingBottom" data-ng-show="!main.userIsPrivate">
+                                <strong>Media type distribution</strong>
+                            </div>
+                            <canvas data-ng-show="!main.userIsPrivate" id="imageVideoChart" style="margin-left: -60px;"></canvas>
                         </div>
-                        <div data-ng-show="main.userInformation.bio">
-                            <strong>Bio:</strong><br>{{userInformation.bio}}
-                        </div>
-                        <div data-ng-show="main.userInformation.website" style="word-wrap: break-word;">
-                            <strong>Website:</strong><br><a target="_blank" href="{{userInformation.website}}">{{userInformation.website}}</a>
-                        </div>
-
-                        <div class="paddingBottom" style="padding-top: 20px;" data-ng-show="!main.userIsPrivate">
-                            <strong>Image/video/gallery distribution</strong>
-                        </div>
-                        <canvas data-ng-show="!main.userIsPrivate" id="main.imageVideoChart" style="margin-left: -60px;"></canvas>
-
-                        <div class="paddingBottom paddingTop">
-                            <strong>Follows:</strong> {{userInformation.follows}}<br>
-                            <strong>Followers:</strong> {{userInformation.followed_by}}<br>
-                            <strong>Content count:</strong> {{userInformation.contentCount}}
+                        <div id="column3">
+                            <div class="paddingBottom">
+                                <strong>Follows:</strong> {{main.userInformation.follows}}<br>
+                                <strong>Followers:</strong> {{main.userInformation.followed_by}}<br>
+                                <strong>Content count:</strong> {{main.userInformation.contentCount}}
+                            </div>
                         </div>
                     </div>
-                    <div id="column2">
-                        <div class="paddingBottom">
-                            <strong>Most liked posts</strong>
+                    <div class="row">
+                        <div class="paddingTop" id="column1" style="width: 100%; padding-right: 15px;">
+                            <table style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align: center;">
+                                            <strong>Thumbnail</strong>
+                                        </th>
+                                        <th data-ng-click="main.currentSorting = 'likes'; main.sortReverse = !main.sortReverse;" class="clickable" data-ng-class="{'selectedSorting': main.currentSorting === 'likes'}">
+                                            <span class="glyphicon glyphicon-heart" style="color: red;"></span>
+                                        </th>
+                                        <th data-ng-click="main.currentSorting = 'comments'; main.sortReverse = !main.sortReverse;" class="clickable" data-ng-class="{'selectedSorting': main.currentSorting === 'comments'}">
+                                            <span class="glyphicon glyphicon-comment" style="color: yellow;"></span>
+                                        </th>
+                                        <th data-ng-click="main.currentSorting = 'timestamp'; main.sortReverse = !main.sortReverse;" class="clickable" data-ng-class="{'selectedSorting': main.currentSorting === 'timestamp'}">
+                                            <strong>Date</strong>
+                                        </th>
+                                        <th data-ng-click="main.currentSorting = 'isAd'; main.sortReverse = !main.sortReverse;" class="clickable" data-ng-class="{'selectedSorting': main.currentSorting === 'isAd'}">
+                                            <strong>Is ad</strong>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-ng-repeat="image in main.imagedb | orderBy: main.currentSorting:main.sortReverse | limitTo: main.listLimit">
+                                        <td style="padding: 20px;">
+                                            <a href="{{image.link}}" target="_blank">
+                                                <div style="background: url({{image.thumbnail}}); background-position: center center;" class="thumbnail">
+                                                </div>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {{image.likes}}
+                                        </td>
+                                        <td>
+                                            {{image.comments}}
+                                        </td>
+                                        <td>
+                                            {{image.timestamp | dateFilter}}
+                                        </td>
+                                        <td>
+                                            {{image.isAd}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <a href="" data-ng-click="main.listLimit = main.listLimit - 5" data-ng-show="!main.userIsPrivate && main.listLimit > 5">Show less</a>
+                            <a href="" data-ng-click="main.listLimit = main.listLimit + 5" data-ng-show="!main.userIsPrivate">Show more</a>
                         </div>
-                        <div data-ng-show="main.userIsPrivate">
-                            This user has a private account. Therefore you cannot see its contents.
-                        </div>
-                        <div data-ng-repeat="image in main.imagedb | orderBy: 'likes':true | limitTo: main.likesListLimit" style="width: 150px;">
-                            <a href="{{image.link}}" target="_blank">
-                                <div style="background: url({{image.thumbnail}}); background-position: center center;" class="thumbnail">
-                                    <span style="padding: 5px; color: white; background: darkgray; border-bottom-right-radius: 4px;">
-                                        {{image.likes}}
-                                        <span class="glyphicon glyphicon-heart" style="color: red;"></span>
-                                    </span>
-                                </div>
-                            </a>
-                        </div>
-                        <a href="" data-ng-click="main.likesListLimit = main.likesListLimit + 5" data-ng-show="!main.userIsPrivate">Show more</a>
                     </div>
-                    <div id="column3">
-                        <div class="paddingBottom">
-                            <strong>Most commented posts</strong>
-                        </div>
-                        <div data-ng-repeat="image in main.imagedb | orderBy: 'comments':true | limitTo: main.commentsListLimit" style="width: 150px;">
-                            <a href="{{image.link}}" target="_blank">
-                                <div style="background: url({{image.thumbnail}}); background-position: center center;" class="thumbnail">
-                                    <span style="padding: 5px; color: white; background: darkgray; border-bottom-right-radius: 4px;">
-                                        {{image.comments}}
-                                        <span class="glyphicon glyphicon-comment" style="color: yellow;"></span>
-                                    </span>
-                                </div>
-                            </a>
-                        </div>
-                        <a href="" data-ng-click="main.commentsListLimit = main.commentsListLimit + 5" data-ng-show="!main.userIsPrivate">Show more</a>
+                    <div class="row paddingTop" style="padding-left: 15px; padding-right: 15px;">
+                        <strong>Total amount of tagged locations:</strong> {{main.postsWithLocations.length}}
+                        <div id="map"></div>
                     </div>
                 </div>
+
                 <div class="loading" data-ng-show="main.loading">
                     <div class="loadingBar">
-                        <p>{{progress}}%</p>
-                        <div class="progressBar" style="width: {{ progress }}%;">
+                        <p>{{main.progress}}%</p>
+                        <div class="progressBar" style="width: {{ main.progress }}%;">
                         </div>
                     </div>
                 </div>

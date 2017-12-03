@@ -108,22 +108,17 @@ div#main{
 }
 
 .thumbnail {
-    opacity: 0.6;
     border: none;
     margin-bottom: 3px;
     border-radius: 5px;
     border-top-left-radius: 0px;
-    height: 150px;
-    width: 150px;
-    padding-left: 0px;
-    padding-top: 3px;
+    height: 60px;
+    width: 60px;
     background-position: center center;
     background-size: 100% 100% !important;
     box-shadow: 6px 6px 10px rgba(43, 40, 40, 0.85);
-
-    &:hover {
-        opacity: 1.0;
-    }
+    margin: 0 auto;
+    border-radius: 10px;
 }
 
 .chart {
@@ -194,6 +189,72 @@ div#main{
     width: 27%;
     display: inline-block;
     vertical-align: top;
+}
+
+table {
+    td, th {
+        width: 20%;
+        text-align: center;
+    }
+
+    thead {
+        th {
+            padding-bottom: 20px;
+            padding-top: 20px;
+            font-size: 21px !important;
+            border-bottom: 5px solid #1f5656;
+
+            &:nth-child(odd) {
+                background-color: #33a2a2;
+            }
+
+            &:nth-child(even) {
+                background-color: #398585;
+            }
+        }
+
+        .selectedSorting {
+            border-top: 6px dashed #1f5656;
+            border-left: 6px dashed #1f5656;
+            border-right: 6px dashed #1f5656;
+        }
+
+        .clickable {
+            cursor: pointer;
+            transition: background-color 0.5s ease;
+            &:hover {
+                background-color: #85c7c7;
+            }
+        }
+    }
+
+    tbody {
+        tr {
+            &:nth-child(odd) {
+                background-color: #9498b9;
+            }
+            &:nth-child(even) {
+                background-color: #626686;
+            }
+
+            border-bottom: 5px solid #1f5656;
+            border-left: 5px solid #1f5656;
+            border-right: 5px solid #1f5656;
+
+            td {
+                font-size: 16px;
+            }
+        }
+    }
+
+    .glyphicon {
+        text-shadow: 1px 1px 10px black !important;
+    }
+}
+
+#map {
+    height: 400px;
+    position: relative;
 }
 
 .loading {

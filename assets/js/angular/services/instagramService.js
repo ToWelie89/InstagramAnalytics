@@ -1,38 +1,53 @@
 
 export default class MapService {
-    constructor($http) {
-        this.$http = $http;
+    constructor() {
     }
 
     getUserData(userName) {
-        return this.$http({
-                url: 'https://instagramanalytics.herokuapp.com/' + userName + '/?__a=1',
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            }).
-            success(function(data, status, headers, config) {
-                return data;
-            }).
-            error(function(data, status, headers, config) {
-                console.error('getUserData fail');
-            });
+        return fetch(`https://instagramanalytics.herokuapp.com/${userName}/?__a=1`)
+        .then((resp) => resp.json())
+        .then(data => {
+            return data;
+        })
+        .catch(err => {
+            console.error(`getUserData failed for username ${userName}`, err);
+            return null;
+        });
     };
 
     getUserDataWithMaxId(userName, nextMaxId) {
-        return this.$http({
-                url: 'https://instagramanalytics.herokuapp.com/' + userName + '/?__a=1&max_id=' + nextMaxId,
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            }).
-            success(function(data, status, headers, config) {
-                return data;
-            }).
-            error(function(data, status, headers, config) {
-                console.error('getUserDataWithMaxId fail');
-            });
+        return fetch(`https://instagramanalytics.herokuapp.com/${userName}/?__a=1&max_id=${nextMaxId}`)
+        .then((resp) => resp.json())
+        .then(data => {
+            return data;
+        })
+        .catch(err => {
+            console.error(`getUserDataWithMaxId failed for username ${userName} and max id ${nextMaxId}`, err);
+            return null;
+        });
+    };
+
+    getPostData(postCode) {
+        return fetch(`https://instagramanalytics.herokuapp.com/p/${postCode}/?__a=1`)
+        .then((resp) => resp.json())
+        .then(data => {
+            return data;
+        })
+        .catch(err => {
+            console.error(`getPostData failed for post code ${postCode}`, err);
+            return null;
+        });
+    };
+
+    getLocation(locationId) {
+        return fetch(`https://instagramanalytics.herokuapp.com/explore/locations/${locationId}/?__a=1`)
+        .then((resp) => resp.json())
+        .then(data => {
+            return data;
+        })
+        .catch(err => {
+            console.error(`getLocation failed for id ${locationId}`, err);
+            return null;
+        });
     };
 }
