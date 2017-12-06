@@ -28,11 +28,12 @@
                 <h1>
                     Instagram Analyzer
                 </h1>
-                <h6>
+                <h6 style="text-align: right;">
+                    Version {{main.version}}<br>
                     Made by <a href="http://www.martinsonesson.se" target="_blank">Martin Sonesson</a>
                 </h6>
 
-                <div class="paddingBottom" style="margin-top:10px;">
+                <div class="paddingBottom" style="margin-top: 10px;">
                     <form>
                         <input id="searchInput" class="form-control" type="text" placeholder="Instagram username" data-ng-model="main.username" data-ng-disabled="main.loading"></input>
                         <button id="searchButton" class="form-control" data-ng-click="main.search()" data-ng-disabled="main.loading"><p style="margin: 0;">Search</p></button>
@@ -40,8 +41,11 @@
                     <span data-ng-show="main.noUserFound && !main.loading && main.searchHasBeenTriggered">No user found</span>
                 </div>
 
-                <div data-ng-show="main.username && !main.loading && !main.noUserFound">
+                <div data-ng-show="!main.loading && !main.noUserFound">
                     <div class="row">
+                        <h3 data-ng-show="main.userIsPrivate" style="padding-left: 15px; padding-right: 15px; color: #b31b10;">
+                            This user has a private account, data can not be analyzed.
+                        </h3>
                         <div id="column1">
                             <div class="paddingBottom">
                                 <strong>User information</strong>
@@ -59,11 +63,11 @@
                                 <strong>Website:</strong><br><a target="_blank" href="{{main.userInformation.website}}">{{main.userInformation.website}}</a>
                             </div>
                         </div>
-                        <div id="column2">
-                            <div class="paddingBottom" data-ng-show="!main.userIsPrivate">
+                        <div id="column2" data-ng-show="!main.userIsPrivate">
+                            <div class="paddingBottom">
                                 <strong>Media type distribution</strong>
                             </div>
-                            <canvas data-ng-show="!main.userIsPrivate" id="imageVideoChart" style="margin-left: -60px;"></canvas>
+                            <canvas data-ng-show="!main.userIsPrivate" id="imageVideoChart"></canvas>
                         </div>
                         <div id="column3">
                             <div class="paddingBottom">
@@ -73,9 +77,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="paddingTop" id="column1" style="width: 100%; padding-right: 15px;">
-                            <table style="width: 100%;">
+                    <div class="row" data-ng-show="!main.userIsPrivate">
+                        <div class="tableContainer paddingTop">
+                            <table>
                                 <thead>
                                     <tr>
                                         <th style="text-align: center;">
@@ -89,9 +93,6 @@
                                         </th>
                                         <th data-ng-click="main.currentSorting = 'timestamp'; main.sortReverse = !main.sortReverse;" class="clickable" data-ng-class="{'selectedSorting': main.currentSorting === 'timestamp'}">
                                             <strong>Date</strong>
-                                        </th>
-                                        <th data-ng-click="main.currentSorting = 'isAd'; main.sortReverse = !main.sortReverse;" class="clickable" data-ng-class="{'selectedSorting': main.currentSorting === 'isAd'}">
-                                            <strong>Is ad</strong>
                                         </th>
                                     </tr>
                                 </thead>
@@ -112,18 +113,17 @@
                                         <td>
                                             {{image.timestamp | dateFilter}}
                                         </td>
-                                        <td>
-                                            {{image.isAd}}
-                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
-                            <a href="" data-ng-click="main.listLimit = main.listLimit - 5" data-ng-show="!main.userIsPrivate && main.listLimit > 5">Show less</a>
-                            <a href="" data-ng-click="main.listLimit = main.listLimit + 5" data-ng-show="!main.userIsPrivate">Show more</a>
+                            <div id="tableLinks">
+                                <a href="" data-ng-click="main.showLess()" data-ng-show="!main.userIsPrivate && main.listLimit > 5">Show less</a>
+                                <a href="" data-ng-click="main.showMore()" data-ng-show="!main.userIsPrivate && main.listLimit < main.imagedb.length">Show more</a>
+                            </div>
                         </div>
                     </div>
-                    <div class="row paddingTop" style="padding-left: 15px; padding-right: 15px;">
-                        <strong>Total amount of tagged locations:</strong> {{main.postsWithLocations.length}}
+                    <div class="row paddingTop" style="padding-left: 15px; padding-right: 15px;" data-ng-show="!main.userIsPrivate">
+                        <strong>Total amount of tagged locations:</strong> {{main.postsWithLocationsAmount}}
                         <div id="map"></div>
                     </div>
                 </div>
