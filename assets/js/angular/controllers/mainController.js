@@ -242,12 +242,12 @@ export default class GameController {
                 backgroundColor: [
                     '#FF5A5E',
                     '#5AD3D1',
-                    '#ff5b91'
+                    '#58ef40'
                 ],
                 borderColor: [
                     '#F7464A',
                     '#46BFBD',
-                    '#f4427d'
+                    '#44cc2e'
                 ],
                 borderWidth: 1
             }]
