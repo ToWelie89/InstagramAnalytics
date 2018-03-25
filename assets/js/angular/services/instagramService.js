@@ -1,5 +1,4 @@
-
-export default class MapService {
+export default class InstagramService {
     constructor() {
     }
 
@@ -7,6 +6,7 @@ export default class MapService {
         return fetch(`https://instagramanalytics.herokuapp.com/${userName}/?__a=1`)
         .then((resp) => resp.json())
         .then(data => {
+            console.log(data);
             return data;
         })
         .catch(err => {

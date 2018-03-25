@@ -59,13 +59,13 @@ export default class MainController {
                 this.vm.userInformation.full_name = response.graphql.user.full_name;
                 this.vm.userInformation.bio = response.graphql.user.biography;
                 this.vm.userInformation.website = response.graphql.user.external_url;
-                this.vm.userInformation.follows = response.graphql.user.follows.count;
-                this.vm.userInformation.followed_by = response.graphql.user.followed_by.count;
-                this.vm.userInformation.contentCount = response.graphql.user.media.count;
+                this.vm.userInformation.follows = response.graphql.user.edge_follow.count;
+                this.vm.userInformation.followed_by = response.graphql.user.edge_followed_by.count;
+                this.vm.userInformation.contentCount = response.graphql.user.edge_owner_to_timeline_media.count;
                 console.log(this.vm.userInformation);
 
-                if (response.graphql.user.media.count > 0 && !this.vm.userIsPrivate) {
-                    this.getAllLocations(response.graphql.user.media.nodes).then(() => {
+                if (response.graphql.user.edge_owner_to_timeline_media.count > 0 && !this.vm.userIsPrivate) {
+                    this.getAllLocations(response.graphql.user.edge_owner_to_timeline_media.edges).then(() => {
                         this.addToFlow(response);
                     });
                 } else {
@@ -93,7 +93,7 @@ export default class MainController {
     getAllLocations(nodes) {
         const promises = [];
         nodes.forEach(node => {
-            const promise = this.instagramService.getPostData(node.code)
+            const promise = this.instagramService.getPostData(node.node.shortcode)
                             .then(res => {
 
                                 if (res.graphql.shortcode_media.taken_at_timestamp) {
@@ -122,7 +122,7 @@ export default class MainController {
         this.instagramService.getUserDataWithMaxId(this.vm.username, nextMaxId)
         .then(response => {
             console.log(response);
-            this.getAllLocations(response.graphql.user.media.nodes).then(() => {
+            this.getAllLocations(response.graphql.user.edge_owner_to_timeline_media.edges).then(() => {
                 this.addToFlow(response);
             });
         })
@@ -134,25 +134,25 @@ export default class MainController {
     };
 
     addToFlow(jsonResp) {
-        var data = jsonResp.user.media.nodes;
+        var data = jsonResp.graphql.user.edge_owner_to_timeline_media.edges;
         for (var i = 0; i < data.length; i++) {
             this.vm.imagedb.push({
-                id: data[i].id,
-                likes: data[i].likes.count,
-                comments: data[i].comments.count,
-                thumbnail: data[i].thumbnail_src,
-                link: 'https://www.instagram.com/p/' + data[i].code,
+                id: data[i].node.id,
+                likes: data[i].node.edge_liked_by.count,
+                comments: data[i].node.edge_media_to_comment.count,
+                thumbnail: data[i].node.thumbnail_src,
+                link: 'https://www.instagram.com/p/' + data[i].node.shortcode,
                 location: data[i].location ? data[i].location : null,
                 timestamp: data[i].timestamp ? data[i].timestamp : null,
                 isAd: data[i].isAd,
                 type: data[i].__typename
             });
 
-            if (data[i].__typename === 'GraphImage') {
+            if (data[i].node.__typename === 'GraphImage') {
                 this.numberOfImages++;
-            } else if (data[i].__typename === 'GraphVideo') {
+            } else if (data[i].node.__typename === 'GraphVideo') {
                 this.numberOfVideos++;
-            } else if (data[i].__typename === 'GraphSidecar') {
+            } else if (data[i].node.__typename === 'GraphSidecar') {
                 this.numberOfGalleries++;
             }
 
@@ -160,8 +160,8 @@ export default class MainController {
             this.$scope.$apply();
         }
 
-        if (jsonResp.user.media.page_info && jsonResp.user.media.page_info.has_next_page) {
-            this.getNextPage(jsonResp.user.media.page_info.end_cursor);
+        if (jsonResp.graphql.user.edge_owner_to_timeline_media.page_info && jsonResp.graphql.user.edge_owner_to_timeline_media.page_info.has_next_page) {
+            this.getNextPage(jsonResp.graphql.user.edge_owner_to_timeline_media.page_info.end_cursor);
         } else {
             console.log('Complete list', this.vm.imagedb);
             this.vm.progress = 100;
