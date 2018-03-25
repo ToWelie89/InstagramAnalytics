@@ -29,11 +29,20 @@ export default class MainController {
 
         // PUBLIC FUNCTIONS
         this.vm.search = this.search;
+        this.vm.showMore = this.showMore;
+        this.vm.showLess = this.showLess;
 
         this.$timeout = $timeout;
         this.instagramService = instagramService;
         this.$q = $q;
         this.$scope = $scope;
+
+        fetch('./package.json')
+        .then((resp) => resp.json())
+        .then((data) => {
+            this.vm.version = data.version;
+            $scope.$apply();
+        });
     }
 
     getInitialFlowForUser(username) {
@@ -61,14 +70,17 @@ export default class MainController {
                     });
                 } else {
                     this.vm.progress = 100;
+                    this.$scope.$apply();
 
-                    this.$timeout(function () {
+                    setTimeout(() => {
                         this.vm.loading = false;
+                        this.$scope.$apply();
                     }, 500);
                 }
             } else {
                 this.vm.loading = false;
                 this.vm.noUserFound = true;
+                this.$scope.$apply();
             }
         })
         .catch(() => {
@@ -152,12 +164,16 @@ export default class MainController {
             this.getNextPage(jsonResp.user.media.page_info.end_cursor);
         } else {
             console.log('Complete list', this.vm.imagedb);
-            this.vm.loading = false;
             this.vm.progress = 100;
+            this.$scope.$apply();
 
+            this.vm.postsWithLocations = this.vm.imagedb.filter(x => x.location);
+            this.vm.postsWithLocationsAmount = this.vm.postsWithLocations.length;
             this.$scope.$apply();
 
             setTimeout(() => {
+                this.vm.loading = false;
+                this.$scope.$apply();
                 this.setChart();
                 this.setMap();
             }, 500);
@@ -169,10 +185,6 @@ export default class MainController {
           center: {lat: 43.769562, lng: 11.255814},
           zoom: 2
         });
-
-        this.vm.postsWithLocations = this.vm.imagedb.filter(x => x.location);
-
-        console.log(this.vm.postsWithLocations);
 
         let index = 0;
         this.vm.postsWithLocations.forEach(x => {
@@ -230,12 +242,12 @@ export default class MainController {
                 backgroundColor: [
                     '#FF5A5E',
                     '#5AD3D1',
-                    '#ff5b91'
+                    '#58ef40'
                 ],
                 borderColor: [
                     '#F7464A',
                     '#46BFBD',
-                    '#f4427d'
+                    '#44cc2e'
                 ],
                 borderWidth: 1
             }]
@@ -270,4 +282,16 @@ export default class MainController {
         this.clearPreviousData();
         this.getInitialFlowForUser(this.vm.username.toLowerCase());
     };
+
+    showMore() {
+        if (this.listLimit < this.imagedb.length) {
+            this.listLimit += 5;
+        }
+    }
+
+    showLess() {
+        if (this.listLimit > 5) {
+            this.listLimit -= 5;
+        }
+    }
 };

@@ -172,10 +172,11 @@ div#main{
 }
 
 #column1 {
-    width: 33%;
     display: inline-block;
     vertical-align: top;
     padding-left: 15px;
+    width: 33%;
+    padding-right: 15px;
 }
 
 #column2 {
@@ -191,70 +192,79 @@ div#main{
     vertical-align: top;
 }
 
-table {
-    td, th {
-        width: 20%;
-        text-align: center;
-    }
+#imageVideoChart {
+    margin-left: -60px;
+}
 
-    thead {
-        th {
-            padding-bottom: 20px;
-            padding-top: 20px;
-            font-size: 21px !important;
-            border-bottom: 5px solid #1f5656;
 
-            &:nth-child(odd) {
-                background-color: #33a2a2;
+.tableContainer {
+    table {
+        width: 100%;
+        td, th {
+            width: 25%;
+            text-align: center;
+        }
+
+        thead {
+            th {
+                padding-bottom: 20px;
+                padding-top: 20px;
+                font-size: 21px !important;
+                border-bottom: 5px solid #1f5656;
+
+                &:nth-child(odd) {
+                    background-color: #33a2a2;
+                }
+
+                &:nth-child(even) {
+                    background-color: #398585;
+                }
             }
 
-            &:nth-child(even) {
-                background-color: #398585;
+            .selectedSorting {
+                border-top: 6px dashed #1f5656;
+                border-left: 6px dashed #1f5656;
+                border-right: 6px dashed #1f5656;
+            }
+
+            .clickable {
+                cursor: pointer;
+                transition: background-color 0.5s ease;
+                &:hover {
+                    background-color: #85c7c7;
+                }
             }
         }
 
-        .selectedSorting {
-            border-top: 6px dashed #1f5656;
-            border-left: 6px dashed #1f5656;
-            border-right: 6px dashed #1f5656;
-        }
+        tbody {
+            tr {
+                &:nth-child(odd) {
+                    background-color: #9498b9;
+                }
+                &:nth-child(even) {
+                    background-color: #626686;
+                }
 
-        .clickable {
-            cursor: pointer;
-            transition: background-color 0.5s ease;
-            &:hover {
-                background-color: #85c7c7;
+                border-bottom: 5px solid #1f5656;
+                border-left: 5px solid #1f5656;
+                border-right: 5px solid #1f5656;
+
+                td {
+                    font-size: 16px;
+                }
             }
         }
-    }
 
-    tbody {
-        tr {
-            &:nth-child(odd) {
-                background-color: #9498b9;
-            }
-            &:nth-child(even) {
-                background-color: #626686;
-            }
-
-            border-bottom: 5px solid #1f5656;
-            border-left: 5px solid #1f5656;
-            border-right: 5px solid #1f5656;
-
-            td {
-                font-size: 16px;
-            }
+        .glyphicon {
+            text-shadow: 1px 1px 10px black !important;
         }
-    }
-
-    .glyphicon {
-        text-shadow: 1px 1px 10px black !important;
     }
 }
 
 #map {
     height: 400px;
     position: relative;
+    top: 10px;
 }
 
 .loading {
