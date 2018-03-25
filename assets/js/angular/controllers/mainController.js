@@ -1,6 +1,6 @@
 import {DateFilter} from './../filters/dateFilter';
 
-export default class GameController {
+export default class MainController {
     constructor($scope, $timeout, $q, instagramService) {
         this.vm = this;
 
@@ -42,21 +42,21 @@ export default class GameController {
             this.vm.noUserFound = false;
             console.log(response);
 
-            if (response.user) {
+            if (response.graphql.user) {
 
-                this.vm.userIsPrivate = response.user.is_private;
+                this.vm.userIsPrivate = response.graphql.user.is_private;
 
-                this.vm.userInformation.profile_picture = response.user.profile_pic_url;
-                this.vm.userInformation.full_name = response.user.full_name;
-                this.vm.userInformation.bio = response.user.biography;
-                this.vm.userInformation.website = response.user.external_url;
-                this.vm.userInformation.follows = response.user.follows.count;
-                this.vm.userInformation.followed_by = response.user.followed_by.count;
-                this.vm.userInformation.contentCount = response.user.media.count;
+                this.vm.userInformation.profile_picture = response.graphql.user.profile_pic_url;
+                this.vm.userInformation.full_name = response.graphql.user.full_name;
+                this.vm.userInformation.bio = response.graphql.user.biography;
+                this.vm.userInformation.website = response.graphql.user.external_url;
+                this.vm.userInformation.follows = response.graphql.user.follows.count;
+                this.vm.userInformation.followed_by = response.graphql.user.followed_by.count;
+                this.vm.userInformation.contentCount = response.graphql.user.media.count;
                 console.log(this.vm.userInformation);
 
-                if (response.user.media.count > 0 && !this.vm.userIsPrivate) {
-                    this.getAllLocations(response.user.media.nodes).then(() => {
+                if (response.graphql.user.media.count > 0 && !this.vm.userIsPrivate) {
+                    this.getAllLocations(response.graphql.user.media.nodes).then(() => {
                         this.addToFlow(response);
                     });
                 } else {
@@ -110,7 +110,7 @@ export default class GameController {
         this.instagramService.getUserDataWithMaxId(this.vm.username, nextMaxId)
         .then(response => {
             console.log(response);
-            this.getAllLocations(response.user.media.nodes).then(() => {
+            this.getAllLocations(response.graphql.user.media.nodes).then(() => {
                 this.addToFlow(response);
             });
         })
