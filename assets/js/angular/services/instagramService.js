@@ -26,18 +26,6 @@ export default class InstagramService {
         });
     };
 
-    getUserDataWithMaxId(userName, nextMaxId) {
-        return fetch(`https://instagramanalyze.herokuapp.com/${userName}/media?cursor=${nextMaxId}`)
-        .then((resp) => resp.json())
-        .then(data => {
-            return data;
-        })
-        .catch(err => {
-            console.error(`getUserDataWithMaxId failed for username ${userName} and max id ${nextMaxId}`, err);
-            return null;
-        });
-    };
-
     getPostData(postCode) {
         return fetch(`https://instagramanalyze.herokuapp.com/p/${postCode}/?__a=1`)
         .then((resp) => resp.json())

@@ -13,12 +13,13 @@ npm install
 ```
 grunt
 ```
-4. Check the folder "model". In here you must create a file called secret.php. In it paste the code:
-
+4. Start a local server by running
 ```
-<?php
-    $accessToken = "<your access token that you generate using Instagram API, check their docs>";
-?>
+npm start
 ```
 
-The file instagramService.php in the model-folder contains the calls to Instagrams API for fetching data. Since php is used you may need software like WAMP/LAMP server to run locally.
+You should now be able to demo the application by visiting http://localhost:8080
+
+## The API
+
+At the moment this application does NOT communicate with the official Instagram API due to limitations introduced to the API recently. Instead I am using a third part API, namely [this one](https://github.com/whizzzkid/instagram-proxy-api).
