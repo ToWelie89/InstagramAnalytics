@@ -52,7 +52,6 @@ export default class MainController {
             console.log(response);
 
             if (response.graphql.user) {
-
                 this.vm.userIsPrivate = response.graphql.user.is_private;
 
                 this.vm.userInformation.profile_picture = response.graphql.user.profile_pic_url;
@@ -63,42 +62,70 @@ export default class MainController {
                 this.vm.userInformation.followed_by = response.graphql.user.edge_followed_by.count;
                 this.vm.userInformation.contentCount = response.graphql.user.edge_owner_to_timeline_media.count;
                 console.log(this.vm.userInformation);
-
-                if (response.graphql.user.edge_owner_to_timeline_media.count > 0 && !this.vm.userIsPrivate) {
-                    this.getAllLocations(response.graphql.user.edge_owner_to_timeline_media.edges).then(() => {
-                        this.addToFlow(response);
-                    });
-                } else {
-                    this.vm.progress = 100;
-                    this.$scope.$apply();
-
-                    setTimeout(() => {
-                        this.vm.loading = false;
-                        this.$scope.$apply();
-                    }, 500);
-                }
             } else {
                 this.vm.loading = false;
                 this.vm.noUserFound = true;
                 this.$scope.$apply();
             }
+
+            if (this.vm.userIsPrivate) {
+                this.vm.progress = 100;
+                this.$scope.$apply();
+
+                setTimeout(() => {
+                    this.vm.loading = false;
+                    this.$scope.$apply();
+                }, 500);
+            }
+        })
+        .catch(() => {
+            setTimeout(() => {
+                console.error(':(');
+                this.vm.loading = false;
+                this.vm.noUserFound = true;
+                this.$scope.$apply();
+            }, 500);
+        });
+    }
+
+    getMedia(userName) {
+        if (this.vm.userIsPrivate || this.vm.noUserFound) {
+            return;
+        }
+        return this.instagramService.getUserMedia(userName)
+        .then(response => {
+            this.vm.noUserFound = false;
+            console.log(response);
+
+            if (response.posts.length > 0) {
+                this.getAllLocations(response.posts).then(() => {
+                    this.addToFlow(response);
+                });
+            } else {
+                this.vm.progress = 100;
+                this.$scope.$apply();
+
+                setTimeout(() => {
+                    this.vm.loading = false;
+                    this.$scope.$apply();
+                }, 500);
+            }
         })
         .catch(() => {
             console.error(':(');
             this.vm.loading = false;
-            this.vm.noUserFound = true;
         });
     }
 
-    getAllLocations(nodes) {
+    getAllLocations(posts) {
         const promises = [];
-        nodes.forEach(node => {
-            const promise = this.instagramService.getPostData(node.node.shortcode)
+        posts.forEach(post => {
+            const promise = this.instagramService.getPostData(post.shortcode)
                             .then(res => {
 
                                 if (res.graphql.shortcode_media.taken_at_timestamp) {
-                                    node.timestamp = res.graphql.shortcode_media.taken_at_timestamp;
-                                    node.isAd = res.graphql.shortcode_media.is_ad;
+                                    post.timestamp = res.graphql.shortcode_media.taken_at_timestamp;
+                                    post.isAd = res.graphql.shortcode_media.is_ad;
                                 }
 
                                 const location = res.graphql.shortcode_media.location;
@@ -110,7 +137,7 @@ export default class MainController {
                             })
                             .then(res => {
                                 if (res) {
-                                    node.location = res.location;
+                                    post.location = res.location;
                                 }
                             });
             promises.push(promise);
@@ -118,15 +145,15 @@ export default class MainController {
         return Promise.all(promises);
     }
 
-    getNextPage(nextMaxId) {
-        this.instagramService.getUserDataWithMaxId(this.vm.username, nextMaxId)
-        .then(response => {
-            console.log(response);
-            this.getAllLocations(response.graphql.user.edge_owner_to_timeline_media.edges).then(() => {
-                this.addToFlow(response);
+    getNextPage(nextLink) {
+        return fetch(nextLink)
+        .then((resp) => resp.json())
+        .then(data => {
+            this.getAllLocations(data.posts).then(() => {
+                this.addToFlow(data);
             });
         })
-        .catch(() => {
+        .catch(err => {
             this.vm.loading = false;
             this.vm.error = true;
             console.error(':(');
@@ -134,25 +161,25 @@ export default class MainController {
     };
 
     addToFlow(jsonResp) {
-        var data = jsonResp.graphql.user.edge_owner_to_timeline_media.edges;
+        var data = jsonResp.posts;
         for (var i = 0; i < data.length; i++) {
             this.vm.imagedb.push({
-                id: data[i].node.id,
-                likes: data[i].node.edge_liked_by.count,
-                comments: data[i].node.edge_media_to_comment.count,
-                thumbnail: data[i].node.thumbnail_src,
-                link: 'https://www.instagram.com/p/' + data[i].node.shortcode,
+                id: data[i].id,
+                likes: data[i].edge_media_preview_like.count,
+                comments: data[i].edge_media_to_comment.count,
+                thumbnail: data[i].thumbnail_src,
+                link: 'https://www.instagram.com/p/' + data[i].shortcode,
                 location: data[i].location ? data[i].location : null,
                 timestamp: data[i].timestamp ? data[i].timestamp : null,
                 isAd: data[i].isAd,
                 type: data[i].__typename
             });
 
-            if (data[i].node.__typename === 'GraphImage') {
+            if (data[i].__typename === 'GraphImage') {
                 this.numberOfImages++;
-            } else if (data[i].node.__typename === 'GraphVideo') {
+            } else if (data[i].__typename === 'GraphVideo') {
                 this.numberOfVideos++;
-            } else if (data[i].node.__typename === 'GraphSidecar') {
+            } else if (data[i].__typename === 'GraphSidecar') {
                 this.numberOfGalleries++;
             }
 
@@ -160,8 +187,8 @@ export default class MainController {
             this.$scope.$apply();
         }
 
-        if (jsonResp.graphql.user.edge_owner_to_timeline_media.page_info && jsonResp.graphql.user.edge_owner_to_timeline_media.page_info.has_next_page) {
-            this.getNextPage(jsonResp.graphql.user.edge_owner_to_timeline_media.page_info.end_cursor);
+        if (jsonResp.next) {
+            this.getNextPage(jsonResp.next);
         } else {
             console.log('Complete list', this.vm.imagedb);
             this.vm.progress = 100;
@@ -280,7 +307,8 @@ export default class MainController {
         this.vm.loading = true;
         this.vm.error = false;
         this.clearPreviousData();
-        this.getInitialFlowForUser(this.vm.username.toLowerCase());
+        this.getInitialFlowForUser(this.vm.username.toLowerCase())
+            .then(() => this.getMedia(this.vm.username.toLowerCase()));
     };
 
     showMore() {

@@ -3,10 +3,9 @@ export default class InstagramService {
     }
 
     getUserData(userName) {
-        return fetch(`https://instagramanalytics.herokuapp.com/${userName}/?__a=1`)
+        return fetch(`https://instagramanalyze.herokuapp.com/${userName}/?__a=1`)
         .then((resp) => resp.json())
         .then(data => {
-            console.log(data);
             return data;
         })
         .catch(err => {
@@ -15,8 +14,20 @@ export default class InstagramService {
         });
     };
 
+    getUserMedia(userName) {
+        return fetch(`https://instagramanalyze.herokuapp.com/${userName}/media?count=15`)
+        .then((resp) => resp.json())
+        .then(data => {
+            return data;
+        })
+        .catch(err => {
+            console.error(`getUserMedia failed for username ${userName}`, err);
+            return null;
+        });
+    };
+
     getUserDataWithMaxId(userName, nextMaxId) {
-        return fetch(`https://instagramanalytics.herokuapp.com/${userName}/?__a=1&max_id=${nextMaxId}`)
+        return fetch(`https://instagramanalyze.herokuapp.com/${userName}/media?cursor=${nextMaxId}`)
         .then((resp) => resp.json())
         .then(data => {
             return data;
@@ -28,7 +39,7 @@ export default class InstagramService {
     };
 
     getPostData(postCode) {
-        return fetch(`https://instagramanalytics.herokuapp.com/p/${postCode}/?__a=1`)
+        return fetch(`https://instagramanalyze.herokuapp.com/p/${postCode}/?__a=1`)
         .then((resp) => resp.json())
         .then(data => {
             return data;
@@ -40,7 +51,7 @@ export default class InstagramService {
     };
 
     getLocation(locationId) {
-        return fetch(`https://instagramanalytics.herokuapp.com/explore/locations/${locationId}/?__a=1`)
+        return fetch(`https://instagramanalyze.herokuapp.com/explore/locations/${locationId}/?__a=1`)
         .then((resp) => resp.json())
         .then(data => {
             return data;
