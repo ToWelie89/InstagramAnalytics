@@ -136,8 +136,9 @@ export default class MainController {
                                 }
                             })
                             .then(res => {
+                                console.log('Location: ', res);
                                 if (res) {
-                                    post.location = res.location;
+                                    post.location = res.graphql.location;
                                 }
                             });
             promises.push(promise);
