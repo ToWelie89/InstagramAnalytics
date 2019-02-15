@@ -1,3 +1,6 @@
+
+**DO NOTE:** The Instagram API that this project relied on has been terminated because Instagram have implemented lots of restrictions on who can access their data, which means this project is useless from now on.
+
 # InstagramAnalytics
 
 Demo: http://martinsonesson.se/instagramanalytics/
